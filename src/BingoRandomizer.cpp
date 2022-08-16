@@ -1,11 +1,12 @@
-#include <iostream>
-#include <string>
 #include <array>
 #include <fstream>
-#include <random>
-#include <vector>
-#include <sstream>
+#include <iostream>
 #include <iterator>
+#include <random>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <opencv2/opencv.hpp>
 
 namespace Bingo {
@@ -15,6 +16,7 @@ namespace Bingo {
     // Function definitions
     std::vector<std::string> split(const std::string& string, char delimiter);
     void _split(const std::string& string, char delimiter, std::vector<std::string>& result);
+    std::vector<std::string> pair(const std::vector<std::string>& splitVector);
     void add_bingo_text(cv::Mat& image, const std::string& text, int widthIncrement, int heightOrigin);
     template <typename T>
     void __log(T msg);
@@ -38,49 +40,24 @@ namespace Bingo {
             std::mt19937{ std::random_device{}() }
         );
 
+        if (card[2][2] != "stream starts") {
+            for (auto& row : card) {
+                for (auto& cell : row) {
+                    if (cell == "stream starts") {
+                        cell = card[2][2];
+                        card[2][2] = DO_NOT_RENDER;
+                        break;
+                    }
+                }
+            }
+        }
+
         return card;
     }
 
     void add_bingo_text(cv::Mat& image, const std::string& text, int x_origin, int y_origin) {
         std::vector<std::string> splitVector = split(text, ' ');
-
-        // Splits the text into two words at a time
-        uint8_t index = 0;
-        std::string temp;
-        std::vector<std::string> stringPairs;
-        bool pushedBack = false;
-        while (index != splitVector.size()) {
-            // This word is too long to fit two in one line :weirdge:
-            if (splitVector[0] == "tare104ka") {
-                if (index % 2 == 1)
-                    temp = splitVector[index];
-                else {
-                    if (index != 0) temp += " ";
-                    temp += splitVector[index];
-                    stringPairs.push_back(temp);
-                    pushedBack = true;
-                    __log("Pushing back: " + temp);
-                }
-            }
-
-            else {
-                if (index % 2 == 0)
-                    temp = splitVector[index];
-                else {
-                    temp += " ";
-                    temp += splitVector[index];
-                    stringPairs.push_back(temp);
-                    pushedBack = true;
-                    __log("Pushing back: " + temp);
-                }
-            }
-            
-            index++;
-            // If we reach the end of the pairs of words and didn't add the last word, add it
-            if (index == splitVector.size() && !pushedBack)
-                stringPairs.push_back(temp);
-            pushedBack = false;
-        }
+        std::vector<std::string> stringPairs = pair(splitVector);
 
         // Draw the text on the image
         uint8_t counter = 0;
@@ -114,16 +91,10 @@ namespace Bingo {
         uint8_t rowCounter = 0;
         for (const auto& row : cardText) {
             for (const auto& cell : row) {
-                // Make sure stream starts goes in the middle
-                if (cell == "stream starts") {
-                    continue;
-                }
-
-                if (rowCounter == 2 && colCounter == 2) {
+                if (cell == DO_NOT_RENDER) {
                     colCounter++;
                     continue;
                 }
-
                 add_bingo_text(card, cell, 70 + 133 * rowCounter, y_origin + colCounter * 133);
                 colCounter++;
                 __log("Writing: " + cell);
@@ -149,6 +120,45 @@ namespace Bingo {
         while (std::getline(isstream, item, delimiter)) {
             result.emplace_back(item);
         }
+    }
+
+    std::vector<std::string> pair(const std::vector<std::string>& splitVector) {
+        uint8_t index = 0;
+        std::string temp;
+        std::vector<std::string> stringPairs;
+        bool pushedBack = false;
+        while (index != splitVector.size()) {
+            // This word is too long to fit two in one line :weirdge:
+            if (splitVector[0] == "tare104ka") {
+                if (index % 2 == 1)
+                    temp = splitVector[index];
+                else {
+                    if (index != 0) temp += " ";
+                    temp += splitVector[index];
+                    stringPairs.push_back(temp);
+                    pushedBack = true;
+                    __log("Pushing back: " + temp);
+                }
+            }
+            else {
+                if (index % 2 == 0)
+                    temp = splitVector[index];
+                else {
+                    temp += " ";
+                    temp += splitVector[index];
+                    stringPairs.push_back(temp);
+                    pushedBack = true;
+                    __log("Pushing back: " + temp);
+                }
+            }
+            index++;
+            // If we reach the end of the pairs of words and didn't add the last word, add it
+            if (index == splitVector.size() && !pushedBack)
+                stringPairs.push_back(temp);
+            pushedBack = false;
+        }
+
+        return stringPairs;
     }
 
     template <typename T>
