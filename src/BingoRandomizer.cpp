@@ -114,6 +114,16 @@ namespace Bingo {
         uint8_t rowCounter = 0;
         for (const auto& row : cardText) {
             for (const auto& cell : row) {
+                // Make sure stream starts goes in the middle
+                if (cell == "stream starts") {
+                    continue;
+                }
+
+                if (rowCounter == 2 && colCounter == 2) {
+                    colCounter++;
+                    continue;
+                }
+
                 add_bingo_text(card, cell, 70 + 133 * rowCounter, y_origin + colCounter * 133);
                 colCounter++;
                 __log("Writing: " + cell);
@@ -121,6 +131,8 @@ namespace Bingo {
             rowCounter++;
             colCounter = 0;
         }
+
+        add_bingo_text(card, "stream starts", 343, y_origin + 30 + 2 * 133);
     }
 
     // String splitting function
