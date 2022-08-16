@@ -62,6 +62,7 @@ namespace Bingo {
                     __log("Pushing back: " + temp);
                 }
             }
+
             else {
                 if (index % 2 == 0)
                     temp = splitVector[index];
@@ -73,6 +74,7 @@ namespace Bingo {
                     __log("Pushing back: " + temp);
                 }
             }
+            
             index++;
             // If we reach the end of the pairs of words and didn't add the last word, add it
             if (index == splitVector.size() && !pushedBack)
@@ -84,23 +86,23 @@ namespace Bingo {
         uint8_t counter = 0;
         for (const auto& inText : stringPairs) {
             cv::putText(image,
-                inText,
-                cv::Point(x_origin, y_origin + 30 * counter),
-                cv::FONT_HERSHEY_SIMPLEX,
-                0.5,
-                __BLACK__,
-                3,
-                cv::LINE_AA
+                        inText,
+                        cv::Point(x_origin, y_origin + 30 * counter),
+                        cv::FONT_HERSHEY_DUPLEX,
+                        0.5,
+                        __BLACK__,
+                        3,
+                        cv::LINE_AA
             );
 
             cv::putText(image,
-                inText,
-                cv::Point(x_origin, y_origin + 30 * counter),
-                cv::FONT_HERSHEY_SIMPLEX,
-                0.5,
-                __WHITE__,
-                1,
-                cv::LINE_AA
+                        inText,
+                        cv::Point(x_origin, y_origin + 30 * counter),
+                        cv::FONT_HERSHEY_DUPLEX,
+                        0.5,
+                        __WHITE__,
+                        1,
+                        cv::LINE_AA
             );
             counter++;
         }
