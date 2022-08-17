@@ -8,26 +8,15 @@
 #include <vector>
 
 #include <opencv2/opencv.hpp>
+#include "BingoRandomizer.hpp"
+#include "Utils.hpp"
 
 namespace Bingo {
-    const cv::Scalar __WHITE__ = cv::Scalar::all(255);
-    const cv::Scalar __BLACK__ = cv::Scalar::all(0);
-    const std::string DO_NOT_RENDER;
-
-    // Function definitions
-    std::vector<std::string> split(const std::string& string, char delimiter);
-    void _split(const std::string& string, char delimiter, std::vector<std::string>& result);
-    std::vector<std::string> pair(const std::vector<std::string>& splitVector);
-    void add_bingo_text(cv::Mat& image, const std::string& text, int widthIncrement, int heightOrigin);
-    template <typename T>
-    void __log(T msg);
-
     cv::Mat open_image(const char* _path) {
         return cv::imread(_path);
     }
 
     // Shuffles the bingo options array
-    typedef std::array<std::array<std::string, 5>, 5> BINGO_CARD;
     BINGO_CARD randomize_bingo(BINGO_CARD& card) {
         for (auto& row : card) {
             std::shuffle(std::begin(row),
@@ -98,7 +87,7 @@ namespace Bingo {
                 }
                 add_bingo_text(card, cell, 70 + 133 * rowCounter, y_origin + colCounter * 133);
                 colCounter++;
-                __log("Writing: " + cell);
+                Utils::__log("Writing: " + cell);
             }
             rowCounter++;
             colCounter = 0;
@@ -138,7 +127,7 @@ namespace Bingo {
                     temp += splitVector[index];
                     stringPairs.push_back(temp);
                     pushedBack = true;
-                    __log("Pushing back: " + temp);
+                    Utils::__log("Pushing back: " + temp);
                 }
             }
             else {
@@ -149,7 +138,7 @@ namespace Bingo {
                     temp += splitVector[index];
                     stringPairs.push_back(temp);
                     pushedBack = true;
-                    __log("Pushing back: " + temp);
+                    Utils::__log("Pushing back: " + temp);
                 }
             }
             index++;
@@ -161,42 +150,4 @@ namespace Bingo {
 
         return stringPairs;
     }
-
-    template <typename T>
-    void __log(T msg) {
-        std::cout << "[BINGO LOG]: " << msg << "\n";
-    }
-}
-
-int WinMain() {
-    // Array of bingo options
-    Bingo::BINGO_CARD bingoCardOptions = { {
-        {"die from reading chat", "db grimm or gas gl", "pub leaves after down or custody", "tare104ka mute after dumb tts", "lobby with wrong tactic"},
-        {"forced to play jimmy", "creepy wants eclipse", "cant pick a build for too long", "dog", "leech player downs 8+ times"},
-        {"\"what is he doing\"", "pub mentions infamy", "stream starts", "hidden modlist cheater", "less than level 100 player"},
-        {"i outkill the entire pub combined", "pub with inspire doesnt revive", "pd2 related tts", "tts scams someone", "bay1k joins the lobby"},
-        {"timeout revenge", "kicked", "pub build has a mistake", "rocky says one thing and vanishes", "someone doesnt know that i stream"}
-    } };
-
-    // Shuffle options
-    Bingo::randomize_bingo(bingoCardOptions);
-
-    // Open image
-    cv::Mat bingoCard = Bingo::open_image("bingoCard.png");
-    // Add the bingo card cells to the image
-    Bingo::array_to_card(bingoCard, bingoCardOptions, bingoCard.rows / 4 - 15);
-    // Save the image
-    bool isWritten = cv::imwrite("RandomizedBingoCard.png", bingoCard);
-    // Make sure there are no errors
-    if (!isWritten) {
-        Bingo::__log("Error saving image.");
-        std::cin.get();
-        return -1;
-    }
-    Bingo::__log("Successfuly saved image.");
-
-    // Confirmation window
-    cv::imshow("Bingo Card", bingoCard);
-    cv::waitKey(0);
-    return 0;
 }
