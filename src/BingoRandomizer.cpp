@@ -29,19 +29,6 @@ namespace Bingo {
             std::end(card),
             std::mt19937{ std::random_device{}() }
         );
-
-        if (card[2][2] != "stream starts") {
-            for (auto& row : card) {
-                for (auto& cell : row) {
-                    if (cell == "stream starts") {
-                        cell = card[2][2];
-                        card[2][2] = DO_NOT_RENDER;
-                        break;
-                    }
-                }
-            }
-        }
-
         return card;
     }
 
@@ -77,20 +64,14 @@ namespace Bingo {
 
     // Draws the array on the image cell-by-cell
     void array_to_card(cv::Mat& card, const BINGO_CARD& cardText, int y_origin) {
-        uint8_t colCounter = 0;
-        uint8_t rowCounter = 0;
-        for (const auto& row : cardText) {
-            for (const auto& cell : row) {
-                if (cell == DO_NOT_RENDER) {
-                    colCounter++;
+        bool breakFlag = false;
+        for (uint8_t row = 0; row < 5; ++row) {
+            for (uint8_t col = 0; col < 5; ++col) {
+                if (row == 2 && col == 2) 
                     continue;
-                }
-                add_bingo_text(card, cell, 70 + 133 * rowCounter, y_origin + colCounter * 133);
-                colCounter++;
-                Utils::__log("Writing: " + cell);
+                else
+                    add_bingo_text(card, cardText[row][col], 70 + 133 * row, y_origin + col * 133);
             }
-            rowCounter++;
-            colCounter = 0;
         }
 
         add_bingo_text(card, "stream starts", 343, y_origin + 30 + 2 * 133);
