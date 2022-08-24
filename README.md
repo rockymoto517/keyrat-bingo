@@ -2,7 +2,7 @@
 - [OpenCV 4.6](https://opencv.org/releases/ "OpenCV 4.6")
 
 # Download
-- [Release](https://github.com/rockymoto517/keyrat-bingo/releases/ "Release")
+- [Release](https://github.com/rockymoto517/keyrat-bingo/releases/latest/ "Release")
 
 ## How to use
 1. Open main.exe
